@@ -42,8 +42,6 @@ function print_usage() {
   echo "Note - this script provides some help in using Google Cloud Dataproc - as you learn the gcloud"
   echo "commands, you can skip this script."
 }
-
-
 create)   # create <bucket>
 
  if (( $# < 2 )); then
