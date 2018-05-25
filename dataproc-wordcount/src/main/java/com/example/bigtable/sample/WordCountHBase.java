@@ -79,7 +79,7 @@ public class WordCountHBase {
      int sum = 0;
        for(IntWritable value : values)
        {
-       sum += value.get();
+    	   sum += value.get();
        }
        con.write(word, new IntWritable(sum));
    }
