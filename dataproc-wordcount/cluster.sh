@@ -14,9 +14,8 @@
 #    limitations under the License.
 
 PHASE=""
-DEFAULT_ZONE="asia-south1-a"
+DEFAULT_ZONE="asia-east1-a"
 DEFAULT_CLUSTER='wordcount-isprimenumber-cluster'
-
 
 # Mac OS X -- "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 # Linux -- google-chrome
@@ -42,7 +41,21 @@ function print_usage() {
   echo "Note - this script provides some help in using Google Cloud Dataproc - as you learn the gcloud"
   echo "commands, you can skip this script."
 }
-create   # create <bucket>
+
+if [ $# = 0 ]; then
+  print_usage
+  exit
+fi
+
+COMMAND=$1
+case $COMMAND in
+  # usage flags
+  --help|-help|-h)
+    print_usage
+    exit
+    ;;
+
+create)   # create <bucket>
 
  if (( $# < 2 )); then
    print_usage
@@ -59,9 +72,13 @@ create   # create <bucket>
    --worker-machine-type n1-standard-2
  ;;
 
+delete)  # delete [<clusterName>]
 
+  CLUSTER="${2:-$DEFAULT_CLUSTER}"
+  gcloud -q dataproc clusters delete "$CLUSTER"
+  ;;
 
-start  # start [<clusterName>]
+start)  # start [<clusterName>]
 
  CLUSTER="${2:-$DEFAULT_CLUSTER}"
 
@@ -69,9 +86,37 @@ start  # start [<clusterName>]
  gcloud dataproc jobs submit hadoop --cluster "$CLUSTER" \
    --jar target/wordcount-mapreduce-0-SNAPSHOT-jar-with-dependencies.jar \
    -- wordcount-hbase \
-   gs://wordcount-isprimenumber-bucket/input/input.txt \
+   gs://wordcount-isprimenumber-bucket/input.txt \
    gs://wordcount-isprimenumber-bucket/output \
    "${TARGET}"
    echo "Output table is: ${TARGET}"
  ;;
+
+
+ssh)  # ssh [<clusterName>]
+
+  CLUSTER="${2:-$DEFAULT_CLUSTER}"
+  MASTER="${CLUSTER}-m"
+
+# --ssh-flag='-N' --ssh-flag='-n'
+
+  gcloud compute ssh --ssh-flag='-D 1080'  "${MASTER}"
+  ;;
+
+chrome) # chrome [<clusterName>]
+
+  CLUSTER="${2:-$DEFAULT_CLUSTER}"
+
+  MASTER="${CLUSTER}-m"
+
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
+    --proxy-server="socks5://localhost:1080" \
+    --host-resolver-rules="MAP * 0.0.0.0 , EXCLUDE localhost" \
+    --user-data-dir="/tmp/" \
+    --incognito \
+    --disable-plugins-discovery \
+    --disable-plugins \
+    "http://${MASTER}:8088"
+  ;;
+
 esac
