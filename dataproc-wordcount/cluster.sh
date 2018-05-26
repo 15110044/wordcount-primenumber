@@ -53,7 +53,7 @@ case $COMMAND in
   --help|-help|-h)
     print_usage
     exit
-    ;
+    ;;
 
 create)   # create <bucket>
 
@@ -70,7 +70,7 @@ create)   # create <bucket>
    --zone $ZONE \
    --master-machine-type n1-standard-2 \
    --worker-machine-type n1-standard-2
- ;
+ ;;
 
 delete)  # delete [<clusterName>]
 
@@ -90,7 +90,7 @@ start)  # start [<clusterName>]
    gs://wordcount-isprimenumber-bucket/output \
    "${TARGET}"
    echo "Output table is: ${TARGET}"
- ;
+ ;;
 
 
 ssh)  # ssh [<clusterName>]
@@ -101,7 +101,7 @@ ssh)  # ssh [<clusterName>]
 # --ssh-flag='-N' --ssh-flag='-n'
 
   gcloud compute ssh --ssh-flag='-D 1080'  "${MASTER}"
-  ;
+  ;;
 
 chrome) # chrome [<clusterName>]
 
@@ -117,5 +117,5 @@ chrome) # chrome [<clusterName>]
     --disable-plugins-discovery \
     --disable-plugins \
     "http://${MASTER}:8088"
-  ;
+  ;;
 esac
